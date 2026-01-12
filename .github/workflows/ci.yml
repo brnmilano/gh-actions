@@ -63,7 +63,12 @@ jobs:
       - name: 🔍 Executar Lint
         run: npm run lint
 
-      # 5️⃣ Build da aplicação
+      # 5️⃣ Executar Testes
+      # Roda os testes unitários com Jest
+      - name: 🧪 Executar Testes
+        run: npm test
+
+      # 6️⃣ Build da aplicação
       # Compila o projeto Next.js
       - name: 🏗️ Build da aplicação
         run: npm run build
