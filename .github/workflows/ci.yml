@@ -1,0 +1,69 @@
+# ============================================
+# 🔄 Workflow de CI (Continuous Integration)
+# ============================================
+# Este arquivo define as automações que rodam
+# sempre que código é enviado ao repositório.
+
+name: CI - gh-actions # Nome do workflow (aparece na aba Actions do GitHub)
+
+# ============================================
+# 🎯 TRIGGERS - Quando este workflow executa?
+# ============================================
+on:
+  # Executa quando há push nas branches main ou develop
+  push:
+    branches:
+      - main
+      - develop
+
+  # Executa quando há Pull Request para main ou develop
+  pull_request:
+    branches:
+      - main
+      - develop
+
+# ============================================
+# 💼 JOBS - O que será executado?
+# ============================================
+jobs:
+  # --------------------------------------------
+  # Job de Build e Lint
+  # --------------------------------------------
+  build:
+    name: 🏗️ Build & Lint # Nome amigável do job
+
+    # Define o sistema operacional do runner
+    # ubuntu-latest é gratuito e mais rápido
+    runs-on: ubuntu-latest
+
+    # --------------------------------------------
+    # STEPS - Passos do job
+    # --------------------------------------------
+    steps:
+      # 1️⃣ Checkout do código
+      # Baixa o código do repositório para o runner
+      - name: 📥 Checkout do código
+        uses: actions/checkout@v4
+
+      # 2️⃣ Configurar Node.js
+      # Instala a versão do Node.js especificada
+      - name: 📦 Configurar Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20" # Versão LTS do Node
+          cache: "npm" # Cache das dependências (acelera builds)
+
+      # 3️⃣ Instalar dependências
+      # Roda npm ci (instalação limpa, ideal para CI)
+      - name: 📚 Instalar dependências
+        run: npm ci
+
+      # 4️⃣ Executar Lint
+      # Verifica erros de código e padronização
+      - name: 🔍 Executar Lint
+        run: npm run lint
+
+      # 5️⃣ Build da aplicação
+      # Compila o projeto Next.js
+      - name: 🏗️ Build da aplicação
+        run: npm run build
