@@ -1,96 +1,210 @@
-// ============================================
-// 🧪 Testes do componente Button
-// ============================================
-// Este arquivo demonstra como testar componentes
-// React usando Jest + React Testing Library
-
 import { render, screen } from "@testing-library/react";
-import userEvent from "@testing-library/user-event";
-import { Button } from "./Button";
+import { Button } from "./button";
+import { ButtonSizes, ButtonVariants } from "./button.type";
 
-// ============================================
-// 📦 describe: Agrupa testes relacionados
-// ============================================
-describe("Button", () => {
-  // ============================================
-  // ✅ it/test: Define um caso de teste
-  // ============================================
+describe("Button Component", () => {
+  test("should match snapshot.", () => {
+    const { container } = render(
+      <Button
+        text="Snapshot Button"
+        ariaLabel="Snapshot Button"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+      />,
+    );
 
-  it("deve renderizar o texto do botão", () => {
-    // 1️⃣ Arrange (Preparar): Renderiza o componente
-    render(<Button>Clique aqui</Button>);
+    expect(container).toMatchSnapshot();
+  });
 
-    // 2️⃣ Act (Agir): Neste caso, apenas buscamos o elemento
-    const button = screen.getByRole("button", { name: /clique aqui/i });
+  test("should check if the passed ref points to the correct DOM element.", () => {
+    const ref = { current: null };
 
-    // 3️⃣ Assert (Verificar): Confirma que está na tela
+    render(
+      <Button
+        text="Ref Button"
+        ariaLabel="Ref Button"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+        ref={ref}
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: /ref button/i });
+
     expect(button).toBeInTheDocument();
+    expect(ref.current).toBe(button);
   });
 
-  it("deve chamar onClick quando clicado", async () => {
-    // Cria uma função "espiã" para verificar se foi chamada
-    const handleClick = jest.fn();
+  test("should render the button with correct text and aria-label.", () => {
+    render(
+      <Button
+        text="Click Me"
+        ariaLabel="Click Me"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+      />,
+    );
 
-    render(<Button onClick={handleClick}>Enviar</Button>);
+    const button = screen.getByRole("button", { name: /click me/i });
 
-    // userEvent simula interações reais do usuário
-    const user = userEvent.setup();
-    await user.click(screen.getByRole("button"));
-
-    // Verifica se a função foi chamada exatamente 1 vez
-    expect(handleClick).toHaveBeenCalledTimes(1);
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveTextContent("Click Me");
   });
 
-  it("não deve chamar onClick quando desabilitado", async () => {
+  test("should call onClick handler when clicked.", () => {
     const handleClick = jest.fn();
 
     render(
-      <Button onClick={handleClick} disabled>
-        Desabilitado
-      </Button>,
+      <Button
+        text="Click Me"
+        ariaLabel="Click Me"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+        onClick={handleClick}
+      />,
     );
 
-    const user = userEvent.setup();
-    await user.click(screen.getByRole("button"));
+    const button = screen.getByRole("button", { name: /click me/i });
 
-    // Função NÃO deve ter sido chamada
+    expect(button).toBeInTheDocument();
+
+    button.click();
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  test("should check keyboard focus (tab) and visible focus indicator.", () => {
+    render(
+      <Button
+        text="Focus Me"
+        ariaLabel="Focus Me"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: /focus me/i });
+
+    expect(button).toBeInTheDocument();
+    expect(document.body).toHaveFocus();
+
+    button.focus();
+    expect(button).toHaveFocus();
+  });
+
+  test("should check reading by screen reader (aria-label, aria-pressed, etc.)", () => {
+    render(
+      <Button
+        text="Aria Button"
+        ariaLabel="Aria Button"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+        aria-pressed="false"
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: /aria button/i });
+
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("aria-label", "Aria Button");
+    expect(button).toHaveAttribute("aria-pressed", "false");
+  });
+
+  test("should if the onClick event is fired when clicked.", () => {
+    const handleClick = jest.fn();
+
+    render(
+      <Button
+        text="Clickable Button"
+        ariaLabel="Clickable Button"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+        onClick={handleClick}
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: /clickable button/i });
+
+    expect(button).toBeInTheDocument();
+
+    button.click();
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  test("should check if it does not fire onClick when disabled.", () => {
+    const handleClick = jest.fn();
+
+    render(
+      <Button
+        text="Disabled Button"
+        ariaLabel="Disabled Button"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.PRIMARY}
+        onClick={handleClick}
+        disabled
+      />,
+    );
+
+    const button = screen.getByRole("button", { name: /disabled button/i });
+
+    expect(button).toBeInTheDocument();
+    expect(button).toBeDisabled();
+
+    button.click();
     expect(handleClick).not.toHaveBeenCalled();
   });
 
-  it("deve estar desabilitado quando disabled=true", () => {
-    render(<Button disabled>Desabilitado</Button>);
+  test("should verify that form attributes work as expected when used in forms.", () => {
+    render(
+      <form>
+        <Button
+          text="Submit Button"
+          ariaLabel="Submit Button"
+          size={ButtonSizes.MEDIUM}
+          buttonVariant={ButtonVariants.PRIMARY}
+          type="submit"
+        />
+      </form>,
+    );
 
-    const button = screen.getByRole("button");
+    const button = screen.getByRole("button", { name: /submit button/i });
 
-    // Matcher do jest-dom para verificar estado
-    expect(button).toBeDisabled();
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveAttribute("type", "submit");
   });
 
-  it("deve aplicar a classe correta para variant primary", () => {
-    render(<Button variant="primary">Primary</Button>);
+  test("should apply SMALL size and PRIMARY variant.", () => {
+    const { container } = render(
+      <Button
+        text="Test Button"
+        ariaLabel="Test Button"
+        size={ButtonSizes.SMALL}
+        buttonVariant={ButtonVariants.PRIMARY}
+      />,
+    );
 
-    const button = screen.getByTestId("button");
+    const button = screen.getByRole("button", { name: /test button/i });
 
-    expect(button).toHaveClass("button-primary");
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveTextContent("Test Button");
+    expect(container.firstChild).toHaveClass("size-small");
+    expect(container.firstChild).toHaveClass("primary");
   });
 
-  it("deve aplicar a classe correta para variant secondary", () => {
-    render(<Button variant="secondary">Secondary</Button>);
+  test("should apply MEDIUM size and SECONDARY variant.", () => {
+    const { container } = render(
+      <Button
+        text="Test Button"
+        ariaLabel="Test Button"
+        size={ButtonSizes.MEDIUM}
+        buttonVariant={ButtonVariants.SECONDARY}
+      />,
+    );
 
-    const button = screen.getByTestId("button");
+    const button = screen.getByRole("button", { name: /test button/i });
 
-    expect(button).toHaveClass("button-secondary");
+    expect(button).toBeInTheDocument();
+    expect(button).toHaveTextContent("Test Button");
+    expect(container.firstChild).toHaveClass("size-medium");
+    expect(container.firstChild).toHaveClass("secondary");
   });
 });
-
-// ============================================
-// 📝 Conceitos demonstrados:
-// ============================================
-// - render(): Renderiza o componente para teste
-// - screen: Acessa elementos renderizados
-// - getByRole(): Busca por papel acessível (melhor prática)
-// - getByTestId(): Busca por data-testid (fallback)
-// - userEvent: Simula interações do usuário
-// - jest.fn(): Cria função mock para verificar chamadas
-// - expect(): Faz asserções sobre os resultados
-// ============================================

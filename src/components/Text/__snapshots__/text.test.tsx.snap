@@ -1,0 +1,12 @@
+// Jest Snapshot v1, https://jestjs.io/docs/snapshot-testing
+
+exports[`Text Component should match snapshot. 1`] = `
+<div>
+  <p
+    class="text-large"
+    style="color: rgb(51, 51, 51);"
+  >
+    Lorem Ipsum is not simply random text.
+  </p>
+</div>
+`;

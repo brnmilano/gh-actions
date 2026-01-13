@@ -1,28 +1,29 @@
-// ============================================
-// 🔘 Componente Button - Exemplo para testes
-// ============================================
+"use client";
 
-interface ButtonProps {
-  children: React.ReactNode;
-  onClick?: () => void;
-  disabled?: boolean;
-  variant?: "primary" | "secondary";
-}
+import { ButtonSizes, ButtonVariants, type ButtonProps } from "./button.type";
+import styles from "./button.module.scss";
 
-export function Button({
-  children,
-  onClick,
-  disabled = false,
-  variant = "primary",
-}: ButtonProps) {
+export function Button(props: ButtonProps) {
+  const {
+    text,
+    buttonVariant = ButtonVariants.PRIMARY,
+    size = ButtonSizes.SMALL,
+    disabled = false,
+    ariaLabel,
+    ...rest
+  } = props;
+
   return (
     <button
-      onClick={onClick}
+      className={`
+        ${styles.button} 
+        ${styles[buttonVariant]} 
+        ${styles[`size-${size}`]}`}
+      aria-label={ariaLabel}
       disabled={disabled}
-      className={`button button-${variant}`}
-      data-testid="button"
+      {...rest}
     >
-      {children}
+      {text}
     </button>
   );
 }
